@@ -1,13 +1,13 @@
 /**
- * @file rs232.h
+ * @file i2c_user.h
  * @author kubanec
- * @date 18.8.2012
+ * @date 9.8.2012
  *
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef RS232_H_
-#define RS232_H_
+#ifndef I2C_USER_H_
+#define I2C_USER_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -15,20 +15,41 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "picoc.h"
-#include "chprintf.h"
+#include "ch.h"
+#include "hal.h"
+#include "harmonist.h"
+#include "delay.h"
+
+/**
+ * PCA register set
+ */
+#define PCA_IDR 	0
+#define PCA_ODR		1
+#define PCA_POL		2
+#define PCA_DDR		3
+
+/**
+ * PCA port direction
+ */
+#define PCA_OUTPUT  0
+#define PCA_INPUT	1
+
+#include "i2c_leds.h"
+#include "i2c_buttons.h"
+
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-extern BaseSequentialStream * marshall;
-extern const struct LibraryFunction rs232_picoc_table[];
+#define _BV(x) (1<<x)
 /* Exported macro ------------------------------------------------------------*/
-
 /* Exported functions --------------------------------------------------------*/
-void serial_init(void);
-void serialPicocIncludeInit(Picoc *pc);
+void i2c_init(I2CDriver * i2c);
+#ifdef I2C_TEST
+void i2c_test(void);
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* RS232_H_ */
+#endif /* I2C_USER_H_ */

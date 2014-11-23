@@ -27,7 +27,7 @@ extern "C"
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "i2c_user.h"
+#include <board_parts/i2c/i2c_master.h>
 /* Exported types ------------------------------------------------------------*/
 /**
  * @brief počet poloh MODE
@@ -123,7 +123,7 @@ extern const harmonizer_t HARMONIZER;
  * extern jenom kvuli makrum na ovládání
  * @notapi
  */
-extern bool_t _harm_enabled;
+extern bool _harm_enabled;
 
 /**
  *  @brief I2C address set for harmonizer - PCA9536

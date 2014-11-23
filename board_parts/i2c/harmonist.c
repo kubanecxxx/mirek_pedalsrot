@@ -9,9 +9,9 @@
 #include "ch.h"
 #include "hal.h"
 #include "harmonist.h"
+#include "picoc.h"
 #include "rs232.h"
 #include "footswitch.h"
-#include "logic_types.h"
 
 /**
  * @addtogroup HARMONIST
@@ -25,8 +25,8 @@
 #ifdef I2C_HARMONIST
 static WORKING_AREA(wa_harmonizer,256);
 #endif
-bool_t _harm_enabled;
-extern logic_active_t active;
+bool _harm_enabled;
+//extern logic_active_t active;
 
 ///@brief sada konstant pro DAC
 const harmonizer_t HARMONIZER =

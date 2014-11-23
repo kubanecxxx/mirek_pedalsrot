@@ -67,7 +67,6 @@ typedef struct
 #define BUTTON_EVENT_ID 0b01
 #define BUTTON_NOW_EVENT_ID 0b10
 /* Exported macro ------------------------------------------------------------*/
-extern EventSource event_i2c_buttons;
 extern foot_t foot_switch;
 
 #define foot_SetLedsYellow(data) _foot_SetLeds(PCA_LED_1_ADDRESS,data)
@@ -89,14 +88,14 @@ extern foot_t foot_switch;
 
 /* Exported functions --------------------------------------------------------*/
 #ifdef I2C_FOOTSWITCH
-void foot_init(void);
+void foot_init(I2CDriver * i2c);
 uint8_t _foot_GetLeds(uint8_t address);
 void _foot_SetLeds(uint8_t address, uint8_t data);
 void foot_buttons_interrupt(EXTDriver *extp, expchannel_t channel);
 #define EXTERNAL_INTERRUPT_PCA  EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, foot_buttons_interrupt
 #else
 #define _footGetLeds(x) 0
-#define foot_init() NULL
+#define foot_init(x) NULL
 #define _foot_SetLeds(x,y) NULL
 #define foot_buttons_interrupt(a,b) NULL
 #define EXTERNAL_INTERRUPT_PCA EXT_CH_MODE_DISABLED, NULL

@@ -8,9 +8,6 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "footswitch.h"
-#include "logic_types.h"
-#include "ssd1289/print.h"
-#include "ssd1289/ssd1289_lld.h"
 
 /**
  * @addtogroup FOOTSWITCH
@@ -22,14 +19,13 @@
 #define EVENT_ID 1
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-Thread * foot_thd;
+thread_t * foot_thd;
 static volatile foot_t footswitch;
 foot_t foot_switch;
 EVENTSOURCE_DECL(event_i2c_buttons);
-extern const logic_base_t * base;
 
 /* Private function prototypes -----------------------------------------------*/
-static WORKING_AREA(wa_i2c_receive_thread,256);
+static THD_WORKING_AREA(wa_i2c_receive_thread,256);
 static void i2c_receive_thread(void * data) __attribute__ ((noreturn));
 static void timeout_cb(void * data);
 static uint8_t preprcat(uint8_t data);
@@ -52,7 +48,7 @@ static uint8_t preprcat(uint8_t data);
  * @brief initialize footswitch PCAs, configure external interrupt
  */
 #ifdef I2C_FOOTSWITCH
-void foot_init(void)
+void foot_init(I2CDriver * i2c)
 {
 	uint8_t txbuf[3];
 	uint8_t err;
@@ -215,8 +211,8 @@ static uint8_t preprcat(uint8_t data)
  */
 void foot_buttons_interrupt(EXTDriver *extp, expchannel_t channel)
 {
-	static VirtualTimer vt;
-	static VirtualTimer vt2;
+	static virtual_timer_t vt;
+	static virtual_timer_t vt2;
 
 	(void) channel;
 
@@ -227,7 +223,7 @@ void foot_buttons_interrupt(EXTDriver *extp, expchannel_t channel)
 		chVTResetI(&vt);
 	}
 	extChannelDisableI(extp, channel);
-	chVTSetI(&vt, MS2ST(base->time), timeout_cb, NULL ); //no another interrupt in 200ms (last step)
+	chVTSetI(&vt, MS2ST(200), timeout_cb, NULL ); //no another interrupt in 200ms (last step)
 	chVTSetI(&vt2, MS2ST(10), (vtfunc_t) glitch, extp);
 
 	chEvtSignalFlagsI(foot_thd, EVENT_ID);

@@ -6,9 +6,9 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include <i2c_master.h>
 #include "ch.h"
 #include "hal.h"
-#include "i2c_user.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -16,7 +16,6 @@
 /* Private variables ---------------------------------------------------------*/
 const I2CConfig i2c1_config =
 { .op_mode = OPMODE_I2C, .clock_speed = 40000, .duty_cycle = STD_DUTY_CYCLE };
-extern I2CDriver I2CD1;
 
 /* Private function prototypes -----------------------------------------------*/
 #ifdef I2C_TEST
@@ -36,19 +35,20 @@ static void i2c_test_thread(void * data) __attribute__ ((noreturn));
 /**
  * @brief init i2C1 and init I2C devices
  */
-void i2c1_init(void)
+void i2c_init(I2CDriver * i2c)
 {
 	//pins are already initialized in board.h
-	i2cStart(&I2CD1, &i2c1_config);
+	i2cStart(i2c, &i2c1_config);
+	i2c_leds_init(i2c);
 
 	/*
 	 * fill DAC with default values and PCA setup
 	 */
-	harm_init();
+	//harm_init(i2c);
 	/*
 	 * setup footswitch PCAs
 	 */
-	foot_init();
+	//foot_init(i2c);
 	/*
 	 * DD3 doesn't need any init
 	 */

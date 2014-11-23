@@ -14,6 +14,7 @@
  limitations under the License.
  */
 
+#include <i2c_master.h>
 #include "ch.h"
 #include "hal.h"
 #include "picoc_threads.h"
@@ -48,6 +49,7 @@ int main(void)
 	//board init
 	serial_init();
 	switch_masterGpioInit();
+	i2c_init(&I2CD1);
 
 	while (TRUE)
 	{

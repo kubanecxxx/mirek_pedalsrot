@@ -30,6 +30,9 @@
 
 #define STM32F4xx_MCUCONF
 
+
+#define I2C_FOOTSWITCH
+
 /*
  * HAL driver system settings.
  */
@@ -136,7 +139,7 @@
 /*
  * I2C driver system settings.
  */
-#define STM32_I2C_USE_I2C1                  FALSE
+#define STM32_I2C_USE_I2C1                  TRUE
 #define STM32_I2C_USE_I2C2                  FALSE
 #define STM32_I2C_USE_I2C3                  FALSE
 #define STM32_I2C_BUSY_TIMEOUT              50
