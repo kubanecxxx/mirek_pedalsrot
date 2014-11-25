@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>Bug-icon.png</file>
+    <file>Folders-Uploads-Folder-icon.png</file>
+    <file>Button-Upload-icon.png</file>
+    <file>CD-Burn-icon.png</file>
+    <file>rom-manager-2-icon.png</file>
+    <file>Drives-RAM-Metro-icon.png</file>
+    <file>Actions-network-connect-icon.png</file>
+    <file>Button-Download-icon.png</file>
+    <file>Actions-document-new-icon.png</file>
+    <file>Actions-document-open-icon.png</file>
+    <file>Actions-document-save-as-icon.png</file>
+    <file>Actions-document-save-icon.png</file>
+  </qresource>
+  <qresource prefix="nováPředpona"/>
+</RCC>
