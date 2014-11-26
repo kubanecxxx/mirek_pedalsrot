@@ -1,13 +1,13 @@
 /**
- * @file wah.h
+ * @file input_mgt.h
  * @author kubanec
- * @date 13.10.2012
+ * @date 23. 11. 2014
  *
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef WAH_H_
-#define WAH_H_
+#ifndef MANAGEMENT_INPUT_MGT_H_
+#define MANAGEMENT_INPUT_MGT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,12 +18,13 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-void wah_init(void);
-inline bool_t wah_isEnabled(void);
-inline void wah_event(void);
+void input_mgt_init(void);
+void harm_interrupt(EXTDriver *extp, expchannel_t channel);
+
+#define EXTERNAL_INTERRUPT_HARMONIZER EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, harm_interrupt
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* WAH_H_ */
+#endif /* MANAGEMENT_INPUT_MGT_H_ */

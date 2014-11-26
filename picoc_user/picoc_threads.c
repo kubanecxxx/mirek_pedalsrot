@@ -39,6 +39,7 @@ void ram_enable(bool en)
 
 static msg_t pcb(void *foot)
 {
+
 	chRegSetThreadName("picoc auto");
 	char * p = NULL;
 	if (ram)
@@ -64,16 +65,22 @@ void picoc_threads_init(void)
 	pico_auto = chThdCreateStatic(&picoc_wa, THD_SIZE,
 	NORMALPRIO, &pcb,
 	NULL);
-	pico_interactive = chThdCreateStatic(&picoc_waa, THD_SIZE, NORMALPRIO, &pcb2,
-	NULL);
+	pico_interactive = chThdCreateStatic(&picoc_waa, THD_SIZE, NORMALPRIO,
+			&pcb2,
+			NULL);
 }
 
 void picoc_threads_loop(void)
 {
-	if (chThdTerminatedX(pico_interactive))
+	bool term;
+	chSysLock();
+	term = chThdTerminatedX(pico_interactive);
+	chSysUnlock();
+	if (term)
 	{
-		pico_interactive = chThdCreateStatic(&picoc_waa, THD_SIZE, NORMALPRIO, &pcb2,
-		NULL);
+		pico_interactive = chThdCreateStatic(&picoc_waa, THD_SIZE, NORMALPRIO,
+				&pcb2,
+				NULL);
 	}
 }
 
@@ -85,11 +92,16 @@ void picoc_threads_terminate_auto_thread(void)
 void picoc_run_picoc_auto_thread(const footswitch_picoc_data_t * foot)
 {
 	static footswitch_picoc_data_t d;
-	if (chThdTerminatedX(pico_auto))
+	bool term;
+	chSysLock();
+	term = chThdTerminatedX(pico_auto);
+	chSysUnlock();
+
+	if (term)
 	{
 		memcpy(&d, foot, sizeof(d));
-		pico_auto = chThdCreateStatic(&picoc_wa, THD_SIZE, NORMALPRIO,
-				&pcb, (void*) &d);
+		pico_auto = chThdCreateStatic(&picoc_wa, THD_SIZE, NORMALPRIO, &pcb,
+				(void*) &d);
 	}
 }
 

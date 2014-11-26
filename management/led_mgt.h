@@ -1,34 +1,30 @@
 /**
- * @file i2c_buttons.h
+ * @file led_mgt.h
  * @author kubanec
  * @date 23. 11. 2014
  *
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef BOARD_PARTS_I2C_I2C_BUTTONS_H_
-#define BOARD_PARTS_I2C_I2C_BUTTONS_H_
+#ifndef MANAGEMENT_LED_MGT_H_
+#define MANAGEMENT_LED_MGT_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+extern struct LibraryFunction led_mgt_functions[];
 /* Exported macro ------------------------------------------------------------*/
-
 /* Exported functions --------------------------------------------------------*/
-void i2c_buttons_init(I2CDriver * i2cd);
-void i2c_buttons_cons_thread(thread_t * thd,uint8_t flag);
-void foot_buttons_interrupt(EXTDriver *extp, expchannel_t channel);
-
-
-#define EXTERNAL_INTERRUPT_PCA  EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, foot_buttons_interrupt
-
+void led_mgt_picoc_include(Picoc * pc);
+void led_mgt_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_PARTS_I2C_I2C_BUTTONS_H_ */
+#endif /* MANAGEMENT_LED_MGT_H_ */

@@ -64,6 +64,9 @@ uint8_t i2c_leds_trasmit_receive(led_color_t color, uint8_t led_mask,
 	if (!IS_CODE_OK(code))
 		return 0;
 
+	if (!led_mask)
+		return 0;
+
 	uint8_t addr = colors[color];
 
 	//read modify write

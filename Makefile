@@ -134,12 +134,13 @@ ASMSRC = $(PORTASM)
 
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(OSALINC) $(PLATFORMINC) $(BOARDINC) \
-         $(CHIBIOS)/os/various picoc_user picoc_loader
+         $(CHIBIOS)/os/various picoc_user picoc_loader management
 
 PICOC_USER_SRC = $(wildcard picoc_user/*.c)
         
 
 CSRC += $(PICOC_USER_SRC) picoc_loader/loader_picoc_library.c picoc_loader/stm32f4xx_flash.c
+CSRC += management/input_mgt.c management/led_mgt.c
 
 LIBRARIES = library
 USE_PICOC = yes

@@ -7,6 +7,8 @@
 #include "chsprintf.h"
 #include "rs232.h"
 #include "switch_master.h"
+#include "led_mgt.h"
+#include "i2c_harmonist.h"
 
 extern const Picoc_Callbacks pc_cb;
 extern const Picoc_IO pc_io;
@@ -20,6 +22,8 @@ static const Picoc_User_Library_Table libs[] =
 { "loader.h", NULL, NULL, loaderFunctions },
 { "marshall.h", serialPicocIncludeInit, NULL, rs232_picoc_table },
 { "outputs.h", switch_picoc_include_init, NULL, gpio_picoc_table },
+{ "leds.h", led_mgt_picoc_include, NULL, led_mgt_functions },
+{ "harmonist.h", NULL, NULL, harm_libs },
 { NULL, NULL, NULL, NULL } };
 
 static const Picoc_User_Config auto_cfg =
@@ -36,6 +40,7 @@ int picoc(char *SourceStr, const footswitch_picoc_data_t * foot)
 	static Picoc pc;
 	static const char * enums = " int i;";
 	char variables[100];
+	systime_t t;
 
 	if (!SourceStr || !SourceStr[0])
 		return 1;
@@ -54,7 +59,10 @@ int picoc(char *SourceStr, const footswitch_picoc_data_t * foot)
 	}
 
 	if (debug_enabled)
+	{
 		PlatformPrintf(&pc, "-----start-----\n");
+		t = chVTGetSystemTime();
+	}
 
 	PicocIncludeAllSystemHeaders(&pc);
 
@@ -77,7 +85,10 @@ int picoc(char *SourceStr, const footswitch_picoc_data_t * foot)
 	FALSE, FALSE);
 
 	if (debug_enabled)
-		PlatformPrintf(&pc, "------stop-----\n");
+	{
+		PlatformPrintf(&pc, "------stop---%d ms-\n", chVTGetSystemTime() - t);
+
+	}
 	PicocCleanup(&pc);
 
 	return 0;

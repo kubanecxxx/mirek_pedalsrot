@@ -17,7 +17,7 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "ch.h"
 #include "hal.h"
-#include "harmonist.h"
+#include <board_parts/i2c/i2c_harmonist.h>
 #include "delay.h"
 
 /**

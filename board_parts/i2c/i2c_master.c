@@ -40,15 +40,12 @@ void i2c_init(I2CDriver * i2c)
 	//pins are already initialized in board.h
 	i2cStart(i2c, &i2c1_config);
 	i2c_leds_init(i2c);
+	i2c_buttons_init(i2c);
 
 	/*
 	 * fill DAC with default values and PCA setup
 	 */
-	//harm_init(i2c);
-	/*
-	 * setup footswitch PCAs
-	 */
-	//foot_init(i2c);
+	harm_init(i2c);
 	/*
 	 * DD3 doesn't need any init
 	 */

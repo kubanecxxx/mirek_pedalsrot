@@ -21,6 +21,35 @@
 #include "picoc.h"
 #include "rs232.h"
 #include "switch_master.h"
+#include "input_mgt.h"
+
+static const EXTConfig extcfg =
+{
+{
+{ EXTERNAL_INTERRUPT_HARMONIZER },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+{ EXT_CH_MODE_DISABLED, NULL },
+//{ TOUCH_EXTI },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXTERNAL_INTERRUPT_PCA },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL },
+		{ EXT_CH_MODE_DISABLED, NULL } } };
 
 extern void usb_init(void);
 
@@ -49,7 +78,10 @@ int main(void)
 	//board init
 	serial_init();
 	switch_masterGpioInit();
-	i2c_init(&I2CD1);
+	//i2c_init(&I2CD1);
+	input_mgt_init();
+
+	extStart(&EXTD1, &extcfg);
 
 	while (TRUE)
 	{
