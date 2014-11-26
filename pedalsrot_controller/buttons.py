@@ -21,7 +21,7 @@ class buttons_widget(QtGui.QWidget):
         
         for a in range(0,9):
             b = QtGui.QToolButton(self)
-            b.setText(str(a + 1))
+            b.setText(str(a ))
             b.setProperty("number", a)
             #b.setMaximumWidth(20)
             if a & 1:
@@ -32,6 +32,12 @@ class buttons_widget(QtGui.QWidget):
             s.addWidget(b)
             b.released.connect(self._button_rel_slot)
             b.pressed.connect(self._button_click_slot)
+            st = "Ctrl+"
+            st += str(a)
+            sc = QtGui.QShortcut(QtGui.QKeySequence(st),self)
+            sc.setProperty("number", a)
+            sc.activated.connect(self._button_click_slot)
+            #QtCore.QObject.connect(sc,QtCore.SIGNAL("activated"),b.pressed)
             
             if a == 8:
                 b.setText("harmonizer")

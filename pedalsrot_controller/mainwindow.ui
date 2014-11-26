@@ -80,9 +80,6 @@
    <addaction name="actionDebug"/>
   </widget>
   <widget class="QDockWidget" name="BoardButtons">
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
    <property name="windowTitle">
     <string>Board buttons</string>
    </property>
@@ -94,9 +91,6 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_2">
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
    <property name="windowTitle">
     <string>Terminal</string>
    </property>
@@ -144,9 +138,6 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_5">
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
    <property name="windowTitle">
     <string>Connection</string>
    </property>

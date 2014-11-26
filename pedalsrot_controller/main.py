@@ -10,12 +10,15 @@ import serial.tools.list_ports
 
 import buttons
 import time
+import harm
 
 class main_window(QtGui.QMainWindow):
     def __init__(self):
         super(QtGui.QMainWindow, self).__init__(None)
         self._ui = mainwindow.Ui_MainWindow()
         self._ui.setupUi(self)
+        
+        self._ui.toolBar.setToolTip("Version 0.8\n26.11.2014")
 
         self._ui.actionOpen_file.triggered.connect(self._file_open_slot)
         self._ui.actionSave_File.triggered.connect(self._file_save_slot)
@@ -65,11 +68,36 @@ class main_window(QtGui.QMainWindow):
         self._ui.actionDebug.triggered.connect(self._debug)
         self._ui.actionSave_RAM_to_ROM.triggered.connect(self._ramtorom)
         
+        self._dock = QtGui.QDockWidget(self)
+        h = harm.harm_widget(self)
+        self._dock.setWidget(h)
+        self.addDockWidget(1, self._dock)
+        self._dock.setWindowTitle(self.tr("Harmonizer"))
+        self.connect(h,QtCore.SIGNAL("changed"),self._harmonizer_changed)
+        
+        self._dock.close()
+        
         self._settings = QtCore.QSettings("hyper.ini")
         name = self._settings.value("main/last").toString()
         port = self._settings.value("main/com").toString()
+        geom = self._settings.value("main/geometry").toByteArray()
+        self.restoreGeometry(geom)
+        
         
         self._ui.actionConnect.triggered.connect(self._connect_port)
+            
+        lst = []
+        for a in range(0,4):
+            s = QtGui.QAction(self)
+            lst.append(s)
+            s.setSeparator(True)
+            
+        u = self._ui
+        lst = [self._ui.actionNew_File, u.actionOpen_file,u.actionSave_File,u.actionSave_As,lst[0],
+               u.actionConnect, lst[1], u.actionDownload,u.actionGet_RAM,u.actionGet_ROM,u.actionSave_RAM_to_ROM,
+               lst[2], u.actionUse_RAM,u.actionUse_ROM,lst[3],u.actionDebug]
+        self._ui.groupBox.addActions(lst)
+        self._ui.groupBox.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         
         try:
             idx = self._ui.comboPort.findText(port)
@@ -79,6 +107,19 @@ class main_window(QtGui.QMainWindow):
            
         except:
             
+            pass
+        
+    def closeEvent(self, *args, **kwargs):
+        self._settings.setValue("main/geometry",self.saveGeometry())
+        return QtGui.QMainWindow.closeEvent(self, *args, **kwargs)
+        
+    def __del__(self):
+        try:
+            self._settings.setValue("main/last",self._title)
+            self._settings.setValue("main/com",self._ui.comboPort.currentText())            
+            self._com.close()
+            print "Closing com port"
+        except:
             pass
         
     class moje():
@@ -102,6 +143,13 @@ class main_window(QtGui.QMainWindow):
         self._ui.BoardButtons.setEnabled(enable)
         self._ui.inputTerminal.setEnabled(enable)
         self._ui.buttonEnd.setEnabled(enable)
+        self._dock.setEnabled(enable)
+        
+    def _harmonizer_changed(self,string):
+        try:
+            self._com.write(string + ";\r\n")
+        except:
+            pass
     
     def _connect_port(self,connect):        
         if connect:
@@ -125,18 +173,6 @@ class main_window(QtGui.QMainWindow):
                 self._tmr.stop()
             except:
                 pass
-    
-    def __del__(self):
-        try:
-            self._settings.setValue("main/last",self._title)
-            self._settings.setValue("main/com",self._ui.comboPort.currentText())
-            self._com.close()
-            print "Closing com port"
-        except:
-            pass
-        
-    def closeEvent(self, *args, **kwargs):    
-        return QtGui.QMainWindow.closeEvent(self, *args, **kwargs)
         
     def _ramtorom(self):
         try:

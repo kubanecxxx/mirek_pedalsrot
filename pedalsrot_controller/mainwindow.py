@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Tue Nov 25 23:58:31 2014
+# Created: Wed Nov 26 19:20:09 2014
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -53,7 +53,6 @@ class Ui_MainWindow(object):
         self.toolBar.setObjectName(_fromUtf8("toolBar"))
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.BoardButtons = QtGui.QDockWidget(MainWindow)
-        self.BoardButtons.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.BoardButtons.setObjectName(_fromUtf8("BoardButtons"))
         self.SizerButtons = QtGui.QWidget()
         self.SizerButtons.setObjectName(_fromUtf8("SizerButtons"))
@@ -62,7 +61,6 @@ class Ui_MainWindow(object):
         self.BoardButtons.setWidget(self.SizerButtons)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.BoardButtons)
         self.dockWidget_2 = QtGui.QDockWidget(MainWindow)
-        self.dockWidget_2.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.dockWidget_2.setObjectName(_fromUtf8("dockWidget_2"))
         self.dockWidgetContents_4 = QtGui.QWidget()
         self.dockWidgetContents_4.setObjectName(_fromUtf8("dockWidgetContents_4"))
@@ -88,7 +86,6 @@ class Ui_MainWindow(object):
         self.dockWidget_2.setWidget(self.dockWidgetContents_4)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidget_2)
         self.dockWidget_5 = QtGui.QDockWidget(MainWindow)
-        self.dockWidget_5.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.dockWidget_5.setObjectName(_fromUtf8("dockWidget_5"))
         self.dockWidgetContents_6 = QtGui.QWidget()
         self.dockWidgetContents_6.setObjectName(_fromUtf8("dockWidgetContents_6"))

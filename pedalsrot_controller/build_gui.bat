@@ -1,0 +1,2 @@
+rem c:\openssh\pyinstaller-2.1\pyinstaller.py -y -F    main.py --distpath=../peds -n gui_client_window -p .
+c:\openssh\pyinstaller-2.1\pyinstaller.py -y -F  -w  main.py --distpath=../peds -n hyper-super -p .
