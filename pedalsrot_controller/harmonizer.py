@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'harmonizer.ui'
 #
-# Created: Wed Nov 26 19:40:34 2014
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Thu Nov 27 07:57:37 2014
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 

@@ -3,4 +3,9 @@ build
 .cproject
 .project
 .settings
+*.pyc
+*.spec
+pedalsrot_controler/.settings
+pedalsrot_controler/.project
+pedalsrot_controler/.pydevproject
 

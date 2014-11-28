@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Wed Nov 26 19:20:09 2014
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Fri Nov 28 09:01:38 2014
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -31,16 +31,11 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.horizontalLayout = QtGui.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.groupBox = QtGui.QGroupBox(self.centralwidget)
-        self.groupBox.setObjectName(_fromUtf8("groupBox"))
-        self.verticalLayout = QtGui.QVBoxLayout(self.groupBox)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.editor = QtGui.QPlainTextEdit(self.groupBox)
-        self.editor.setDocumentTitle(_fromUtf8(""))
-        self.editor.setTabStopWidth(20)
-        self.editor.setObjectName(_fromUtf8("editor"))
-        self.verticalLayout.addWidget(self.editor)
-        self.horizontalLayout.addWidget(self.groupBox)
+        self.tabWidget = QTabWidgetKrida(self.centralwidget)
+        self.tabWidget.setDocumentMode(False)
+        self.tabWidget.setTabsClosable(True)
+        self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
+        self.horizontalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -53,6 +48,7 @@ class Ui_MainWindow(object):
         self.toolBar.setObjectName(_fromUtf8("toolBar"))
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.BoardButtons = QtGui.QDockWidget(MainWindow)
+        self.BoardButtons.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.BoardButtons.setObjectName(_fromUtf8("BoardButtons"))
         self.SizerButtons = QtGui.QWidget()
         self.SizerButtons.setObjectName(_fromUtf8("SizerButtons"))
@@ -61,6 +57,7 @@ class Ui_MainWindow(object):
         self.BoardButtons.setWidget(self.SizerButtons)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.BoardButtons)
         self.dockWidget_2 = QtGui.QDockWidget(MainWindow)
+        self.dockWidget_2.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.dockWidget_2.setObjectName(_fromUtf8("dockWidget_2"))
         self.dockWidgetContents_4 = QtGui.QWidget()
         self.dockWidgetContents_4.setObjectName(_fromUtf8("dockWidgetContents_4"))
@@ -86,6 +83,7 @@ class Ui_MainWindow(object):
         self.dockWidget_2.setWidget(self.dockWidgetContents_4)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidget_2)
         self.dockWidget_5 = QtGui.QDockWidget(MainWindow)
+        self.dockWidget_5.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.dockWidget_5.setObjectName(_fromUtf8("dockWidget_5"))
         self.dockWidgetContents_6 = QtGui.QWidget()
         self.dockWidgetContents_6.setObjectName(_fromUtf8("dockWidgetContents_6"))
@@ -181,12 +179,17 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionDebug)
 
         self.retranslateUi(MainWindow)
+        self.tabWidget.setCurrentIndex(-1)
         QtCore.QObject.connect(self.butClear, QtCore.SIGNAL(_fromUtf8("clicked()")), self.terminal.clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.tabWidget, self.terminal)
+        MainWindow.setTabOrder(self.terminal, self.buttonEnd)
+        MainWindow.setTabOrder(self.buttonEnd, self.butClear)
+        MainWindow.setTabOrder(self.butClear, self.inputTerminal)
+        MainWindow.setTabOrder(self.inputTerminal, self.comboPort)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.groupBox.setTitle(_translate("MainWindow", "Editor", None))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar", None))
         self.BoardButtons.setWindowTitle(_translate("MainWindow", "Board buttons", None))
         self.dockWidget_2.setWindowTitle(_translate("MainWindow", "Terminal", None))
@@ -215,4 +218,5 @@ class Ui_MainWindow(object):
         self.actionDebug.setToolTip(_translate("MainWindow", "Debug", None))
         self.actionDebug.setShortcut(_translate("MainWindow", "Ctrl+Shift+D", None))
 
+from qtabwidgetkrida import QTabWidgetKrida
 import resources_rc

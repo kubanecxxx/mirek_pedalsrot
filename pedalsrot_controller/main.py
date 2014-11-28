@@ -18,19 +18,17 @@ class main_window(QtGui.QMainWindow):
         self._ui = mainwindow.Ui_MainWindow()
         self._ui.setupUi(self)
         
-        self._ui.toolBar.setToolTip("Version 0.8\n26.11.2014")
+        self._ui.toolBar.setToolTip("Version 0.9\n28.11.2014")
 
         self._ui.actionOpen_file.triggered.connect(self._file_open_slot)
         self._ui.actionSave_File.triggered.connect(self._file_save_slot)
         self._ui.actionSave_As.triggered.connect(self._file_save_as_slot)
         self._ui.actionNew_File.triggered.connect(self._file_new_file)
-        self._ui.editor.textChanged.connect(self._editor_changed)
-        self._fn = None
+        #self._ui.editor.textChanged.connect(self._editor_changed)
+        #self._fn = None
         self._path = "/home/kubanec/bdsa"
         self._title = "NoName"
         self._window_name = "Hyper-super"
-        self._fileChanged = False
-        self._show_start(False)
         self._com = None
         
         # buttons widget
@@ -74,16 +72,18 @@ class main_window(QtGui.QMainWindow):
         self.addDockWidget(1, self._dock)
         self._dock.setWindowTitle(self.tr("Harmonizer"))
         self.connect(h,QtCore.SIGNAL("changed"),self._harmonizer_changed)
+
+        self.connect(self._ui.tabWidget,QtCore.SIGNAL("tabSwitched"),self._tab_switched)
+        self._tab_switched("None")
         
         self._dock.close()
         
         self._settings = QtCore.QSettings("hyper.ini")
-        name = self._settings.value("main/last").toString()
+        self._path = str(self._settings.value("main/last_path").toString())
         port = self._settings.value("main/com").toString()
         geom = self._settings.value("main/geometry").toByteArray()
         self.restoreGeometry(geom)
-        
-        
+
         self._ui.actionConnect.triggered.connect(self._connect_port)
             
         lst = []
@@ -96,18 +96,32 @@ class main_window(QtGui.QMainWindow):
         lst = [self._ui.actionNew_File, u.actionOpen_file,u.actionSave_File,u.actionSave_As,lst[0],
                u.actionConnect, lst[1], u.actionDownload,u.actionGet_RAM,u.actionGet_ROM,u.actionSave_RAM_to_ROM,
                lst[2], u.actionUse_RAM,u.actionUse_ROM,lst[3],u.actionDebug]
-        self._ui.groupBox.addActions(lst)
-        self._ui.groupBox.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
-        
+        self._ui.tabWidget.addActions(lst)
+        self._ui.tabWidget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+
+
+        a = 0
+        self._lastest = 0
+        while True:
+            st = "main/last_file_%d" % a
+            a += 1
+            ju = str(self._settings.value(st).toString())
+            if len(ju) == 0:
+                break;
+            self._ui.tabWidget.new_tab(ju)
+            self._lastest = a
+
+        self._ui.tabWidget.setCurrentIndex(0)
+        self._enable_widget(False)
+
         try:
             idx = self._ui.comboPort.findText(port)
             self._ui.comboPort.setCurrentIndex(idx)
-            self._load_file(name)
             self._connect_port(True)
            
         except:
-            
             pass
+
         
     def closeEvent(self, *args, **kwargs):
         self._settings.setValue("main/geometry",self.saveGeometry())
@@ -115,13 +129,25 @@ class main_window(QtGui.QMainWindow):
         
     def __del__(self):
         try:
-            self._settings.setValue("main/last",self._title)
-            self._settings.setValue("main/com",self._ui.comboPort.currentText())            
+            self._settings.setValue("main/com",self._ui.comboPort.currentText())
+            self._settings.setValue("main/last_path",self._path)
+
+            for a in range(0,self._lastest):
+                st = "main/last_file_%d" % a
+                self._settings.setValue(st, "")
+
+            lst = self._ui.tabWidget.editor_filenames()
+            idx = 0
+            for a in lst:
+                st = "main/last_file_%d" % idx
+                self._settings.setValue(st, a)
+                idx += 1
+
             self._com.close()
-            print "Closing com port"
         except:
             pass
-        
+
+
     class moje():
         def __init__(self):
             self.button = 0
@@ -198,16 +224,16 @@ class main_window(QtGui.QMainWindow):
         
     def _download(self):
         try:
-        #send secret function
+            #send secret function
             self._com.write("super_secret_function();\r\n" )
-        #wait
+            #wait
             time.sleep(0.1)
-        #send file
-            st = self._ui.editor.toPlainText()
-            self._com.write(str(st))
-        #wait
+            #send file
+            st = self._ui.tabWidget.plainText()
+            self._com.write(str(st) + "\r\n")
+            #wait
             time.sleep(0.1)
-        #send ctrl+c or ctrl+z
+            #send ctrl+c or ctrl+z
             self._end()
         except:
             pass
@@ -281,79 +307,38 @@ class main_window(QtGui.QMainWindow):
             self._com.write(st + "\r\n")
         except:  
             pass
-        
+
     def _file_new_file(self):
-        self._title = "NoName"
-        self._fn = None
-        self._ui.editor.clear()
-        self._show_start(False)
-        
-    def _load_file(self,name):
-        if len(name):
-            fn = QtCore.QFile(name)
-            self._fn = fn
-            fn.open(QtCore.QFile.ReadOnly)
-            st = fn.readAll()
-            fn.close()
-            self._ui.editor.clear()
-            self._ui.editor.appendPlainText(QtCore.QString(st))
-            self._title = name
-            self._show_start(False)
+        self._ui.tabWidget.new_tab(None)
 
     def _file_open_slot(self):
-        # QtGui.QDialog.
-        rewrite = False
-        if self._fileChanged:
-            # @todo msg do you really wanna rewrite...
-            pass
-        else:
-            rewrite = True
-        
-        if rewrite:
-            name = QtGui.QFileDialog.getOpenFileNameAndFilter(self, self.tr("Open File"), self._path, "C files (*.c)")
-            name = name[0]
-            if len(name):
-                self._load_file(name)
+        name = QtGui.QFileDialog.getOpenFileNameAndFilter(self, self.tr("Open File"), self._path, "C files (*.c)")
+        name = name[0]
+        if len(name):
+            dir = QtCore.QFileInfo(name)
+            self._path =  dir.dir().path()
+            self._ui.tabWidget.new_tab(name)
     
     def _file_save_as_slot(self):
         name = QtGui.QFileDialog.getSaveFileNameAndFilter(self, self.tr("Save File"), self._path, "C files (*.c)")
         name = name[0]
         if len(name):
+            dir = QtCore.QFileInfo(name)
+            self._path =  dir.dir().path()
             if not name.endsWith(".c"):
                 name.append(".c")
-            
-            self._fn = QtCore.QFile(name)
-            self._save()
-        pass
+            return self._ui.tabWidget.save_tab(name)
+
+        return False
             
     def _file_save_slot(self):
-        if not self._fn:
+        if not self._ui.tabWidget.save_tab():
             self._file_save_as_slot()
-        else:
-            self._save()
-        
         pass
-    
-    def _save(self):
-        if not self._fn:
-            return
-        
-        self._fn.open(QtCore.QFile.WriteOnly)
-        self._fn.writeData(self._ui.editor.toPlainText())
-        self._fn.close()
-        self._title = self._fn.fileName()
-        self._show_start(False)
-    
-    def _show_start(self, show):
-        tmp = self._window_name + " - " + self._title
-        self._fileChanged = show
-        if show:
-            tmp += "*"
-            
+
+    def _tab_switched(self,text):
+        tmp = self._window_name + " - " + text
         self.setWindowTitle(tmp)
-    
-    def _editor_changed(self):
-        self._show_start(True)
 
 
 app = QtGui.QApplication(sys.argv)
