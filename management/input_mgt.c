@@ -35,8 +35,9 @@ static msg_t input_mgt_thd(void * arg);
 
 void input_mgt_init(void)
 {
-	thd = chThdCreateStatic(&input_mgt_wa, 512, NORMALPRIO, input_mgt_thd,
-	NULL);
+	thd = chThdCreateStatic(&input_mgt_wa, sizeof(input_mgt_wa), NORMALPRIO,
+			input_mgt_thd,
+			NULL);
 	i2c_buttons_cons_thread(thd, EVENT_I2C_BUTTONS);
 	harm_set_cons_thread(thd, EVENT_HARMONIZER_BUTTON);
 
@@ -54,18 +55,21 @@ msg_t input_mgt_thd(void * arg)
 	switch_state state;
 	uint8_t i;
 	eventmask_t mask;
+	thread_t * t;
 
 	while (true)
 	{
-		mask = chEvtWaitAny(
-		EVENT_I2C_BUTTONS | EVENT_HARMONIZER_BUTTON | EVENT_TEST_BUTTON);
+		mask = chEvtWaitAnyTimeout(
+		EVENT_I2C_BUTTONS | EVENT_HARMONIZER_BUTTON | EVENT_TEST_BUTTON,MS2ST(100));
 
 		if ((mask & EVENT_I2C_BUTTONS) || (mask & EVENT_HARMONIZER_BUTTON))
 		{
-			buttons = chMsgGet(chThdGetSelfX());
+			t = chMsgWait();
+			buttons = chMsgGet(t);
+			chMsgRelease(t, 0);
 			if (!buttons)
 			{
-				but = footswitch.state;
+				but = footswitch.switchNumber;
 				state = RELASED;
 			}
 			else
@@ -93,14 +97,17 @@ msg_t input_mgt_thd(void * arg)
 			state = palReadPad(HARM_PORT, HARM_PIN);
 		}
 
-		footswitch.ms = ST2MS(chVTGetSystemTime()) - now;
-		footswitch.switchNumberOld = footswitch.switchNumber;
-		footswitch.stateOld = footswitch.state;
-		footswitch.state = state;
-		footswitch.switchNumber = but;
-		now = ST2MS(chVTGetSystemTime());
+		if (mask)
+		{
+			footswitch.ms = ST2MS(chVTGetSystemTime()) - now;
+			footswitch.switchNumberOld = footswitch.switchNumber;
+			footswitch.stateOld = footswitch.state;
+			footswitch.state = state;
+			footswitch.switchNumber = but;
+			now = ST2MS(chVTGetSystemTime());
 
-		picoc_run_picoc_auto_thread(&footswitch);
+			picoc_run_picoc_auto_thread(&footswitch);
+		}
 	}
 
 	return 0;

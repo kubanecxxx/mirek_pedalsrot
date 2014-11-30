@@ -5,6 +5,7 @@
 #include "hal.h"
 
 #include "chprintf.h"
+#include "gui_api.h"
 
 /*===========================================================================*/
 /* USB related stuff.                                                        */
@@ -20,7 +21,7 @@
 /*
  * Serial over USB Driver structure.
  */
- SerialUSBDriver SDU1;
+SerialUSBDriver SDU1;
 
 /*
  * USB Device Descriptor.
@@ -144,6 +145,7 @@ USB_DESC_WORD(0x0409) /* wLANGID (U.S. English).          */
  */
 static const uint8_t vcom_string1[] =
 { USB_DESC_BYTE(38), /* bLength.                         */
+
 USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
 'S', 0, 'T', 0, 'M', 0, 'i', 0, 'c', 0, 'r', 0, 'o', 0, 'e', 0, 'l', 0, 'e', 0,
 		'c', 0, 't', 0, 'r', 0, 'o', 0, 'n', 0, 'i', 0, 'c', 0, 's', 0 };
@@ -152,9 +154,10 @@ USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
  * Device Description string.
  */
 static const uint8_t vcom_string2[] =
-{  USB_DESC_BYTE(56), /* bLength.                         */
+{ USB_DESC_BYTE(56), /* bLength.                         */
 
 USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
+
 'C', 0, 'h', 0, 'i', 0, 'b', 0, 'i', 0, 'O', 0, 'S', 0, '/', 0, 'R', 0, 'T', 0,
 		' ', 0, 'V', 0, 'i', 0, 'r', 0, 't', 0, 'u', 0, 'a', 0, 'l', 0, ' ', 0,
 		'C', 0, 'O', 0, 'M', 0, ' ', 0, 'P', 0, 'o', 0, 'r', 0, 't', 0 };
@@ -294,8 +297,6 @@ USBD1_INTERRUPT_REQUEST_EP };
 
 #define TEST_WA_SIZE    THD_WORKING_AREA_SIZE(256)
 
-
-
 /*===========================================================================*/
 /* Generic code.                                                             */
 /*===========================================================================*/
@@ -314,11 +315,44 @@ static msg_t Thread1(void *arg)
 		systime_t time;
 
 		time = serusbcfg.usbp->state == USB_ACTIVE ? 100 : 500;
-		palClearPad(GPIOD, 14);
+		gui_api.usb ^= 1;
+
+		chSysLock();
+		if (!chOQIsFullI(&SDU1.oqueue) && !chIQIsFullI(&SDU1.iqueue))
+		{
+
+		}
+
+		chSysUnlock();
 		chThdSleepMilliseconds(time);
-		palSetPad(GPIOD, 14);
-		chThdSleepMilliseconds(time);
+
 	}
+	return 0;
+}
+
+static THD_WORKING_AREA(test,256);
+static msg_t init(void * a)
+{
+	(void)a;
+
+	chThdSleepMilliseconds(1500);
+	usbStart(serusbcfg.usbp, &usbcfg);
+	usbConnectBus(serusbcfg.usbp);
+
+	/*
+	 @* Stopping and restarting the USB in order to test the stop procedure. The
+	 * following lines are not usually required.
+	 */
+	chThdSleepMilliseconds(3000);
+	usbDisconnectBus(serusbcfg.usbp);
+	usbStop(serusbcfg.usbp);
+	chThdSleepMilliseconds(1500);
+	usbStart(serusbcfg.usbp, &usbcfg);
+	usbConnectBus(serusbcfg.usbp);
+
+	chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO + 1, Thread1,
+	NULL);
+
 	return 0;
 }
 
@@ -339,25 +373,11 @@ void usb_init(void)
 	 * after a reset.
 	 */
 	usbDisconnectBus(serusbcfg.usbp);
-	chThdSleepMilliseconds(1500);
-	usbStart(serusbcfg.usbp, &usbcfg);
-	usbConnectBus(serusbcfg.usbp);
 
-	/*
-	 @* Stopping and restarting the USB in order to test the stop procedure. The
-	 * following lines are not usually required.
-	 */
-	chThdSleepMilliseconds(3000);
-	usbDisconnectBus(serusbcfg.usbp);
-	usbStop(serusbcfg.usbp);
-	chThdSleepMilliseconds(1500);
-	usbStart(serusbcfg.usbp, &usbcfg);
-	usbConnectBus(serusbcfg.usbp);
+	chThdCreateStatic(&test, sizeof(test), NORMALPRIO, init, NULL);
 
 	/*
 	 * Creates the blinker thread.
 	 */
-	chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO + 1, Thread1,
-			NULL);
 }
 

@@ -8,6 +8,8 @@ ifeq ($(USE_OPT),)
   USE_OPT = -O0 -ggdb -fomit-frame-pointer -falign-functions=16
 endif
 
+USE_KUBANEC_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
+
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
   USE_COPT = 
@@ -15,7 +17,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti
+  USE_CPPOPT = -fno-rtti  -fno-exceptions
 endif
 
 # Enable this if you want the linker to remove unused code and data
@@ -101,8 +103,6 @@ CSRC = $(PORTSRC) \
        $(HALSRC) \
        $(OSALSRC) \
        $(PLATFORMSRC) \
-       $(BOARDSRC) \
-       $(CHIBIOS)/os/various/chprintf.c \
        main.c usb_setup.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -137,19 +137,43 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(CHIBIOS)/os/various picoc_user picoc_loader management
 
 PICOC_USER_SRC = $(wildcard picoc_user/*.c)
-        
 
+#optimized sources        
+KUBANECSRC = $(PICOCSRC) \
+			 $(CHIBIOS)/os/various/chprintf.c \
+			 $(BOARDSRC) 
+
+
+#Local sources 
 CSRC += $(PICOC_USER_SRC) picoc_loader/loader_picoc_library.c picoc_loader/stm32f4xx_flash.c
 CSRC += management/input_mgt.c management/led_mgt.c
 
-LIBRARIES = library
-USE_PICOC = yes
-include $(LIBRARIES)/rules.mk      
+#ssd1289 port
+CSRC += LCD_Port/ssd1289_port.c LCD_Port/stm32f4xx_fsmc.c
+INCDIR += LCD_Port
 
-
+#include board files
 BOARD_PARTS_DIR = board_parts
 include $(BOARD_PARTS_DIR)/rules.mk
 
+#include picoc
+USE_PICOC = yes
+#include ssd1289
+USE_SSD1289 = yes
+USE_FONTS = yes
+
+PIRIS = piris/framework
+include piris/framework/rules.mk
+include gui/gui.mk
+include touch/touch.mk
+
+#include kubanec library
+LIBRARIES = library
+include $(LIBRARIES)/rules.mk      
+
+
+CPPSRC += $(CPPFILES)
+CSRC += $(KUBANEC_SRC)
 CSRC += $(CFILES)
 #
 # Project, sources and paths
@@ -199,7 +223,7 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DEMBEDDED_HOST
+UDEFS = -DEMBEDDED_HOST -DDRAWING_MODE_CHANGESONLY
 
 # Define ASM defines here
 UADEFS =

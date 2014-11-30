@@ -5,6 +5,7 @@ I2C_USER_INC = $(I2C)
 I2C_USER_SRC = $(I2C)/i2c_master.c $(I2C)/i2c_leds.c
 I2C_USER_SRC += $(I2C)/i2c_buttons.c
 I2C_USER_SRC += $(I2C)/i2c_harmonist.c
+I2C_USER_SRC += $(I2C)/i2c_delay.c
 
 CSRC += $(I2C_USER_SRC)
 INCDIR += $(I2C_USER_INC)

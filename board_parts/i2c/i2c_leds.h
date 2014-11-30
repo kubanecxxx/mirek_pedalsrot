@@ -18,7 +18,7 @@ extern "C"
 /* Exported types ------------------------------------------------------------*/
 typedef enum
 {
-	GREEN = 0, YELLOW = 1
+	GREEN = 0 , YELLOW = 1
 } led_color_t;
 
 typedef enum

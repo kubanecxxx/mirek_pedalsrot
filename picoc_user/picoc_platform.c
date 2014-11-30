@@ -43,7 +43,6 @@ void pc_printf(Picoc *pc, const char *format, ...)
 	va_start(Args, format);
 	if (PrintPossible())
 	{
-
 		chvprintf(usb, format, Args);
 	}
 	/*

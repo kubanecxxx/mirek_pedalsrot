@@ -14,7 +14,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-static THD_WORKING_AREA(led_mgt_wa,128);
+static THD_WORKING_AREA(led_mgt_wa,256);
 static uint8_t flash_mask[2];
 
 /* Private function prototypes -----------------------------------------------*/
@@ -54,7 +54,8 @@ void led_mgt_picoc_include(Picoc * pc)
 
 void led_mgt_init(void)
 {
-	chThdCreateStatic(&led_mgt_wa, 128, NORMALPRIO - 10, led_mgt_thd, NULL);
+	chThdCreateStatic(&led_mgt_wa, sizeof(led_mgt_wa), NORMALPRIO - 10,
+			led_mgt_thd, NULL);
 }
 
 msg_t led_mgt_thd(void * arg)
@@ -153,7 +154,12 @@ static void led_get(struct ParseState *Parser, struct Value *ReturnValue,
 	led_color_t color = Param[0]->Val->Integer;
 	int num = Param[1]->Val->Integer;
 
-	ReturnValue->Val->Integer = i2c_leds_trasmit_receive(color, 1 << num, GET);
+	uint8_t mask = i2c_leds_trasmit_receive(color, 1, GET);
+
+	mask >>= num;
+	mask &= 1;
+
+	ReturnValue->Val->Integer = mask;
 }
 
 static void led_disable_all(struct ParseState *Parser,

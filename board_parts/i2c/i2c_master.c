@@ -9,6 +9,7 @@
 #include <i2c_master.h>
 #include "ch.h"
 #include "hal.h"
+#include "I2c_delay.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -46,9 +47,7 @@ void i2c_init(I2CDriver * i2c)
 	 * fill DAC with default values and PCA setup
 	 */
 	harm_init(i2c);
-	/*
-	 * DD3 doesn't need any init
-	 */
+	delay_init(i2c);
 }
 
 #ifdef I2C_TEST

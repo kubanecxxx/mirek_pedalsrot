@@ -47,8 +47,9 @@ void i2c_buttons_init(I2CDriver * i2cd)
 	TIME_INFINITE);
 	i2cReleaseBus(i2c);
 
-	foot_thd = chThdCreateStatic(&buttons, 256, NORMALPRIO, i2c_receive_thread,
-	NULL);
+	foot_thd = chThdCreateStatic(&buttons, sizeof(buttons), HIGHPRIO,
+			i2c_receive_thread,
+			NULL);
 }
 
 void i2c_buttons_cons_thread(thread_t *thd, uint8_t flag)
@@ -56,6 +57,9 @@ void i2c_buttons_cons_thread(thread_t *thd, uint8_t flag)
 	consum_thd = thd;
 	thd_flag = flag;
 }
+
+static virtual_timer_t vt2;
+static EXTDriver * d;
 
 /**
  * @brief thread for reading button inputs
@@ -67,30 +71,45 @@ msg_t i2c_receive_thread(void * data)
 	uint8_t txbuf = PCA_IDR;
 	uint8_t rxbuf[2];
 	uint8_t temp;
-	uint8_t input_old;
+	uint8_t input_old = 0;
 	static uint32_t brodcasty = 0;
 
+	eventmask_t mask;
 	while (TRUE)
 	{
+#if 0
 		//čeká na přerušení
-		chEvtWaitOne(BUTTON_EVENT_ID);
+		mask = chEvtWaitOneTimeout(BUTTON_EVENT_ID, MS2ST(1000));
 
-		i2cAcquireBus(i2c);
-		i2cMasterTransmit(i2c, PCA_BUTTONS_ADDRESS, &txbuf, 1, rxbuf, 2);
-		i2cReleaseBus(i2c);
-
-		//if any changes then send message
-		temp = reorder(rxbuf[0]);
-		if (input_old != temp)
+		if (mask)
+#endif
 		{
-			input_old = temp;
-			if (consum_thd)
+			i2cAcquireBus(i2c);
+			i2cMasterTransmit(i2c, PCA_BUTTONS_ADDRESS, &txbuf, 1, rxbuf, 2);
+			i2cReleaseBus(i2c);
+
+			//if any changes then send message
+			temp = reorder(rxbuf[0]);
+			if (input_old != temp)
 			{
-				chEvtSignal(consum_thd, thd_flag);
-				chMsgSend(consum_thd, temp);
+				input_old = temp;
+				if (consum_thd)
+				{
+					chEvtSignal(consum_thd, thd_flag);
+					chMsgSend(consum_thd, temp);
+				}
+				brodcasty++;
 			}
-			brodcasty++;
 		}
+		chThdSleepMilliseconds(50);
+#if 0
+		chSysLock();
+		if (!chVTIsArmedI(&vt2))
+		{
+			extChannelEnableI(d, 15);
+		}
+		chSysUnlock();
+#endif
 	}
 	return 0;
 }
@@ -126,14 +145,14 @@ uint8_t reorder(uint8_t data)
  */
 void foot_buttons_interrupt(EXTDriver *extp, expchannel_t channel)
 {
-	static virtual_timer_t vt2;
 
-	(void) channel;
-
+	d = extp;
 	chSysLockFromISR();
 	extChannelDisableI(extp, channel);
-	chVTSetI(&vt2, MS2ST(10), (vtfunc_t) glitch, extp);
+	//if (!chVTIsArmedI(&vt2))
+	//	chVTSetI(&vt2, MS2ST(20), (vtfunc_t) glitch, extp);
 
+	//chDbgAssert(foot_thd, "thd is not defined");
 	chEvtSignalI(foot_thd, BUTTON_EVENT_ID);
 	chSysUnlockFromISR();
 }

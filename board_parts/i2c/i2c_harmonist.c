@@ -11,6 +11,7 @@
 #include "hal.h"
 #include "picoc.h"
 #include "rs232.h"
+#include "gui_api.h"
 
 /**
  * @addtogroup HARMONIST
@@ -237,9 +238,11 @@ static void harm_thread(void * data)
 		temp = harm_getInput_LED(inputs);
 		if (temp != _harm_enabled)
 		{
-			harm_pushButton(inputs);
-			chThdSleepMilliseconds(50);
-			harm_releaseButton(inputs);
+			//harm_pushButton(inputs);
+			//chThdSleepMilliseconds(50);
+			//harm_releaseButton(inputs);
+			inputs ^= 1 << HARM_EFF;
+			_harm_SetOutputs(inputs);
 		}
 
 		//pushing button stated changes send message to consumer thread
@@ -366,12 +369,7 @@ void harm_configure(struct ParseState *Parser, struct Value *ReturnValue,
 	harmony = Param[3]->Val->Integer;
 	volume = Param[4]->Val->Integer;
 
-	if (enable == 0)
-		harm_disable();
-	else if (enable == 1)
-		harm_enable();
-	else if (enable == 2)
-		harm_toggle();
+
 
 	uint8_t inputs = harm_getInputs();
 	_harm_SetOutputs(inputs & ~_BV(HARM_LDAC));
@@ -380,21 +378,25 @@ void harm_configure(struct ParseState *Parser, struct Value *ReturnValue,
 	{
 		harm_mode(mode);
 		a++;
+		gui_api.harm_mode = mode;
 	}
 	if (key != -1 && key < HARM_KEY_COUNT)
 	{
 		harm_key(key);
 		a++;
+		gui_api.harm_key = key;
 	}
 	if (harmony != -1 && harmony < HARM_SHIFT_COUNT)
 	{
 		harm_harmony(harmony);
+		gui_api.harm_harmony = harmony;
 		a++;
 	}
 	if (volume > -1 && volume < 101)
 	{
 		//input value 0-100%
 		harm_volume(10 * volume);
+		gui_api.harm_volume = volume;
 		a++;
 	}
 
@@ -403,7 +405,15 @@ void harm_configure(struct ParseState *Parser, struct Value *ReturnValue,
 		chThdSleepMilliseconds(5);
 		harm_setLDAC(inputs);
 		_harm_SetOutputs(inputs);
+		chThdSleepMilliseconds(5);
 	}
+
+	if (enable == 0)
+		harm_disable();
+	else if (enable == 1)
+		harm_enable();
+	else if (enable == 2)
+		harm_toggle();
 }
 
 /**

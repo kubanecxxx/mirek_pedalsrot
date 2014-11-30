@@ -62,10 +62,10 @@ static msg_t pcb2(void *a)
 
 void picoc_threads_init(void)
 {
-	pico_auto = chThdCreateStatic(&picoc_wa, THD_SIZE,
+	pico_auto = chThdCreateStatic(&picoc_wa, sizeof(picoc_wa),
 	NORMALPRIO, &pcb,
 	NULL);
-	pico_interactive = chThdCreateStatic(&picoc_waa, THD_SIZE, NORMALPRIO,
+	pico_interactive = chThdCreateStatic(&picoc_waa, sizeof(picoc_waa), NORMALPRIO,
 			&pcb2,
 			NULL);
 }
@@ -78,7 +78,7 @@ void picoc_threads_loop(void)
 	chSysUnlock();
 	if (term)
 	{
-		pico_interactive = chThdCreateStatic(&picoc_waa, THD_SIZE, NORMALPRIO,
+		pico_interactive = chThdCreateStatic(&picoc_waa, sizeof(picoc_waa), NORMALPRIO,
 				&pcb2,
 				NULL);
 	}
@@ -100,7 +100,7 @@ void picoc_run_picoc_auto_thread(const footswitch_picoc_data_t * foot)
 	if (term)
 	{
 		memcpy(&d, foot, sizeof(d));
-		pico_auto = chThdCreateStatic(&picoc_wa, THD_SIZE, NORMALPRIO, &pcb,
+		pico_auto = chThdCreateStatic(&picoc_wa, sizeof(picoc_wa), NORMALPRIO, &pcb,
 				(void*) &d);
 	}
 }

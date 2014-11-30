@@ -96,7 +96,7 @@ static void secret_function(struct ParseState *Parser,
 	*p = 0;
 
 	PlatformPrintf(Parser->pc, "memory usage: %d percent (%d of %d bytes)\n",
-			counter / sizeof(script_buffer), counter, sizeof(script_buffer));
+			100*counter / sizeof(script_buffer), counter, sizeof(script_buffer));
 	PlatformPrintf(Parser->pc, "data reading finished, returning to shell\n");
 
 }

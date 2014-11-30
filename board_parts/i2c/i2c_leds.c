@@ -21,7 +21,7 @@
 static I2CDriver * i2c;
 
 static const uint8_t colors[] =
-{ PCA_LED_1_ADDRESS, PCA_LED_2_ADDRESS };
+{ PCA_LED_2_ADDRESS, PCA_LED_1_ADDRESS };
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -58,13 +58,13 @@ static uint8_t reorder(uint8_t in)
 uint8_t i2c_leds_trasmit_receive(led_color_t color, uint8_t led_mask,
 		led_code_t code)
 {
+	if (!led_mask)
+		return 0;
+
 	if (!IS_COLOR_OK(color))
 		return 0;
 
 	if (!IS_CODE_OK(code))
-		return 0;
-
-	if (!led_mask)
 		return 0;
 
 	uint8_t addr = colors[color];
@@ -79,7 +79,7 @@ uint8_t i2c_leds_trasmit_receive(led_color_t color, uint8_t led_mask,
 	i2cReleaseBus(i2c);
 
 	txbuf[0] = PCA_ODR;
-	txbuf[1] = reorder(rxbuf[0]);
+	txbuf[1] = (rxbuf[0]);
 	led_mask = reorder(led_mask);
 
 	if (code == ON)
@@ -96,7 +96,7 @@ uint8_t i2c_leds_trasmit_receive(led_color_t color, uint8_t led_mask,
 	}
 	else if (code == GET)
 	{
-		return (txbuf[1]);
+		return (reorder(txbuf[1]));
 	}
 	else
 	{

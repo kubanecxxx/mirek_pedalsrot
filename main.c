@@ -22,6 +22,8 @@
 #include "rs232.h"
 #include "switch_master.h"
 #include "input_mgt.h"
+#include "led_mgt.h"
+#include "gui_api.h"
 
 static const EXTConfig extcfg =
 {
@@ -72,20 +74,27 @@ int main(void)
 
 	palSetPadMode(GPIOD, 14, PAL_MODE_OUTPUT_PUSHPULL);
 	palSetPadMode(GPIOD, 13, PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOD, 15, PAL_MODE_OUTPUT_PUSHPULL);
 	usb_init();
 	picoc_threads_init();
 
 	//board init
 	serial_init();
 	switch_masterGpioInit();
-	//i2c_init(&I2CD1);
+	i2c_init(&I2CD1);
 	input_mgt_init();
+	led_mgt_init();
+
+	//gui init
+	gui_init();
 
 	extStart(&EXTD1, &extcfg);
+	chThdSetPriority(LOWPRIO);
 
 	while (TRUE)
 	{
 		picoc_threads_loop();
-		chThdSleepMilliseconds(500);
+		chThdSleepMilliseconds(10);
+		gui_loop();
 	}
 }

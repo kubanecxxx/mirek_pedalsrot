@@ -1,55 +1,48 @@
 /**
- * @file i2c_user.h
+ * @file gui_api.h
  * @author kubanec
- * @date 9.8.2012
+ * @date 29. 11. 2014
  *
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef I2C_USER_H_
-#define I2C_USER_H_
+#ifndef GUI_GUI_API_H_
+#define GUI_GUI_API_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "ch.h"
-#include "hal.h"
-#include <board_parts/i2c/i2c_harmonist.h>
-#include <I2c_delay.h>
-
-/**
- * PCA register set
- */
-#define PCA_IDR 	0
-#define PCA_ODR		1
-#define PCA_POL		2
-#define PCA_DDR		3
-
-/**
- * PCA port direction
- */
-#define PCA_OUTPUT  0
-#define PCA_INPUT	1
-
-#include "i2c_leds.h"
-#include "i2c_buttons.h"
-
-
 /* Exported types ------------------------------------------------------------*/
+typedef struct
+{
+	uint8_t volume;
+	uint8_t gain;
+	uint8_t loopEnabled;
+	uint8_t muteEnabled;
+	uint8_t highSensitivity;
+
+	uint8_t harm_mode;
+	uint8_t harm_key;
+	uint8_t harm_volume;
+	uint8_t harm_harmony;
+
+	const char * text;
+	uint8_t text_dirty;
+	uint8_t usb;
+} gui_api_t;
+
 /* Exported constants --------------------------------------------------------*/
-#define _BV(x) (1<<x)
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-void i2c_init(I2CDriver * i2c);
-#ifdef I2C_TEST
-void i2c_test(void);
-#endif
+void gui_init(void);
+void gui_loop(void);
+
+extern gui_api_t gui_api;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* I2C_USER_H_ */
+#endif /* GUI_GUI_API_H_ */

@@ -4,7 +4,7 @@
 /* include only picoc.h here - should be able to use it with only the external interfaces, no internals from interpreter.h */
 #include "picoc.h"
 #include "picoc_threads.h"
-#include "chsprintf.h"
+#include "kchsprintf.h"
 #include "rs232.h"
 #include "switch_master.h"
 #include "led_mgt.h"
@@ -35,21 +35,19 @@ static const Picoc_User_Config interactive_cfg =
 extern uint8_t debug_enabled;
 
 /* platform-dependent code for running programs is in this file */
-int picoc(char *SourceStr, const footswitch_picoc_data_t * foot)
+int picoc(const char *SourceStr, const footswitch_picoc_data_t * foot)
 {
 	static Picoc pc;
-	static const char * enums = " int i;";
 	char variables[100];
 	systime_t t;
 
 	if (!SourceStr || !SourceStr[0])
 		return 1;
 
-	char *pos;
-
 	PicocInitialise(&pc, &auto_cfg);
 	pc.name = (const char *) "auto";
 
+	/*
 	for (pos = SourceStr; *pos != 0; pos++)
 	{
 		if (*pos == 0x1a)
@@ -57,6 +55,8 @@ int picoc(char *SourceStr, const footswitch_picoc_data_t * foot)
 			*pos = 0x20;
 		}
 	}
+	*/
+
 
 	if (debug_enabled)
 	{
@@ -68,8 +68,6 @@ int picoc(char *SourceStr, const footswitch_picoc_data_t * foot)
 
 	if (foot)
 	{
-		PicocParse(&pc, "nofile", enums, strlen(enums), TRUE, TRUE, FALSE,
-		FALSE);
 		chsprintf(variables,
 				"int button = %d;\n int button_old = %d;\n int ms = %d;\n int state = %d;\n int state_old = %d;\n",
 				foot->switchNumber, foot->switchNumberOld, foot->ms,
