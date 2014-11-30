@@ -19,6 +19,7 @@ class main_window(QtGui.QMainWindow):
         self._ui.setupUi(self)
         
         self._ui.toolBar.setToolTip("Version 0.9\n28.11.2014")
+        self._connected = False
 
         self._ui.actionOpen_file.triggered.connect(self._file_open_slot)
         self._ui.actionSave_File.triggered.connect(self._file_save_slot)
@@ -129,7 +130,8 @@ class main_window(QtGui.QMainWindow):
         
     def __del__(self):
         try:
-            self._settings.setValue("main/com",self._ui.comboPort.currentText())
+            if self._connected:
+                self._settings.setValue("main/com",self._ui.comboPort.currentText())
             self._settings.setValue("main/last_path",self._path)
 
             for a in range(0,self._lastest):
@@ -185,6 +187,7 @@ class main_window(QtGui.QMainWindow):
                 self._ui.actionConnect.setChecked(True)
                 self._enable_widget(True)
                 self._tmr.start()
+                self._connected = True
             except:
                 self._ui.actionConnect.setChecked(False)
                 self._enable_widget(False)
@@ -197,12 +200,13 @@ class main_window(QtGui.QMainWindow):
                 self._ui.actionConnect.setChecked(False)
                 self._enable_widget(False)
                 self._tmr.stop()
+                self._connected = False
             except:
                 pass
         
     def _ramtorom(self):
         try:
-            self._com.write("ram_to_rom();")
+            self._com.write("ram_to_rom();\r\n")
         except:
             pass
         

@@ -16,6 +16,8 @@ class QPlainTextEditKrida(QtGui.QPlainTextEdit):
         file_Changed = QtCore.pyqtSignal(bool,name="fileChanged")
         self.name = "NoName"
         self._title = self.name
+        self._title2 = self.name
+        self.just_name = ""
 
         self.textChanged.connect(self._text_changed)
 
@@ -29,11 +31,14 @@ class QPlainTextEditKrida(QtGui.QPlainTextEdit):
                 self._fn = fn
                 self.setPlainText(QtCore.QString( st))
                 self._title = fn.fileName()
+                info = QtCore.QFileInfo(self._title)
+                self._title2 = info.baseName() +"."+ info.completeSuffix()
             except:
                 return False
         else:
             self._fn = None
             self._title = "NoName"
+            self._title2 = "NoName"
 
         self._show_star(False)
         return True
@@ -48,6 +53,8 @@ class QPlainTextEditKrida(QtGui.QPlainTextEdit):
             fn.close()
             self._fn = fn
             self._title = fn.fileName()
+            info = QtCore.QFileInfo(self._title)
+            self._title2 = info.baseName() +"."+ info.completeSuffix()
             self._show_star(False)
         except:
             return False
@@ -61,8 +68,10 @@ class QPlainTextEditKrida(QtGui.QPlainTextEdit):
         tmp = self._title
         self._fileChanged = show
         self.name = self._title
+        self.just_name = self._title2
         if show:
             self.name += "*"
+            self.just_name += "*"
 
         self.emit(QtCore.SIGNAL("fileChanged"),self._fileChanged)
 

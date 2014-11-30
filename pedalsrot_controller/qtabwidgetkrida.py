@@ -27,7 +27,7 @@ class QTabWidgetKrida(QtGui.QTabWidget):
         self.connect(editor,QtCore.SIGNAL("fileChanged"),self._editor_changed)
         self.currentChanged.connect(self._tab_changed)
 
-        self.addTab(editor,editor.name)
+        self.addTab(editor,editor.just_name)
         self.setCurrentWidget(editor)
         editor.setFocus()
         editor.setTabStopWidth(20)
@@ -40,7 +40,9 @@ class QTabWidgetKrida(QtGui.QTabWidget):
     def _editor_changed(self,changed):
         idx = self.currentIndex()
         editor = self.currentWidget()
-        self.setTabText(idx,editor.name)
+        print idx
+        print editor.just_name
+        self.setTabText(idx,editor.just_name)
 
         self.emit(QtCore.SIGNAL("tabSwitched"),editor.name)
         #emit signal tabchanged with new title with or without star
