@@ -211,8 +211,9 @@ const struct LibraryFunction harm_libs[] =
 		 * mode, key, harmony 0-? positions of knobs
 		 * volume 0-100%
 		 *
+		 *	returns harmonizer on - 1, off - 0
 		 */
-	{harm_configure, "void harm_configure(int, int , int ,int ,int);"},
+	{harm_configure, "int harm_configure(int, int , int ,int ,int);"},
 	{	NULL, NULL}};
 
 /**
@@ -414,6 +415,8 @@ void harm_configure(struct ParseState *Parser, struct Value *ReturnValue,
 		harm_enable();
 	else if (enable == 2)
 		harm_toggle();
+
+	ReturnValue->Val->Integer = _harm_enabled;
 }
 
 /**

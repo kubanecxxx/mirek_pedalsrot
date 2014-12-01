@@ -91,6 +91,16 @@ int main(void)
 	extStart(&EXTD1, &extcfg);
 	chThdSetPriority(LOWPRIO);
 
+	footswitch_picoc_data_t d;
+	d.ms = 10000;
+	d.switchNumber = 1;
+	d.state = 1;
+	d.switchNumberOld = 50;
+	d.stateOld = 0;
+
+	chThdSleepMilliseconds(100);
+	picoc_run_picoc_auto_thread(&d);
+
 	while (TRUE)
 	{
 		picoc_threads_loop();
